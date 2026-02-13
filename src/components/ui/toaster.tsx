@@ -13,9 +13,12 @@ export function Toaster() {
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+      {toasts.map(function ({ id, title, description, action, variant, ...props }) {
+        // Adiciona classe de grupo baseada na variante para estilização condicional
+        const groupClass = variant ? `group ${variant}` : "group";
+        
         return (
-          <Toast key={id} {...props}>
+          <Toast key={id} variant={variant} className={groupClass} {...props}>
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (

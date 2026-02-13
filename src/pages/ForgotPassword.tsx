@@ -87,6 +87,7 @@ export default function ForgotPassword() {
       toast({
         title: "Código enviado!",
         description: "Verifique seu email e insira o código de 6 dígitos.",
+        variant: "success",
       });
     } catch (error: any) {
       toast({
@@ -118,6 +119,7 @@ export default function ForgotPassword() {
       toast({
         title: "Código válido!",
         description: "Agora você pode redefinir sua senha.",
+        variant: "success",
       });
     } catch (error: any) {
       toast({
@@ -151,6 +153,7 @@ export default function ForgotPassword() {
       toast({
         title: "Senha redefinida!",
         description: "Sua senha foi alterada com sucesso. Faça login para continuar.",
+        variant: "success",
       });
 
       setTimeout(() => {

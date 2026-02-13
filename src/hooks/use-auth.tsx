@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type LoginRequest } from "../shared/routes";
 import { User } from "../shared/schema";
@@ -39,14 +39,20 @@ function useLoginMutation() {
       // Storing in localStorage for demo purposes if backend sends it in body
       if (data.accessToken) {
         localStorage.setItem("accessToken", data.accessToken);
+        // Dispara evento para atualizar o estado do token
+        window.dispatchEvent(new Event("tokenChanged"));
       }
       
       queryClient.setQueryData([api.auth.me.path], data.user);
-      toast({ title: "Welcome back!", description: "Successfully logged in." });
+      toast({ 
+        title: "Bem-vindo de volta!", 
+        description: "Login realizado com sucesso.",
+        variant: "success"
+      });
     },
     onError: (error: Error) => {
       toast({
-        title: "Login Failed",
+        title: "Erro no Login",
         description: error.message,
         variant: "destructive",
       });
@@ -57,33 +63,102 @@ function useLoginMutation() {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Estado reativo para verificar se há token
+  const [hasToken, setHasToken] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !!localStorage.getItem("accessToken");
+  });
+
+  // Função para atualizar o estado do token
+  const updateTokenState = () => {
+    const token = localStorage.getItem("accessToken");
+    setHasToken(!!token);
+  };
+
   const loginMutation = useLoginMutation();
+  
+  // Atualiza o estado quando o login for bem-sucedido
+  useEffect(() => {
+    if (loginMutation.isSuccess) {
+      updateTokenState();
+    }
+  }, [loginMutation.isSuccess]);
+
+  // Observa mudanças no localStorage
+  useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem("accessToken");
+      setHasToken(!!token);
+    };
+
+    // Verifica inicialmente
+    checkToken();
+
+    // Escuta mudanças no storage (de outros tabs/windows)
+    window.addEventListener("storage", checkToken);
+
+    // Escuta eventos customizados de mudança de token
+    const handleTokenChange = () => checkToken();
+    window.addEventListener("tokenChanged", handleTokenChange);
+
+    return () => {
+      window.removeEventListener("storage", checkToken);
+      window.removeEventListener("tokenChanged", handleTokenChange);
+    };
+  }, []);
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: [api.auth.me.path],
     queryFn: async () => {
-      const res = await fetch(getApiUrl(api.auth.me.path), {
-        headers: getAuthHeaders(),
-        credentials: "include",
-      });
-      
-      if (res.status === 401) {
+      // Verifica novamente se há token antes de fazer a requisição
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
         return null;
       }
-      
-      if (!res.ok) {
-        throw new Error("Failed to fetch user");
+
+      try {
+        const res = await fetch(getApiUrl(api.auth.me.path), {
+          headers: getAuthHeaders(),
+          credentials: "include",
+        });
+        
+        if (res.status === 401) {
+          // Token inválido ou expirado - limpa o localStorage
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          setHasToken(false);
+          return null;
+        }
+        
+        if (!res.ok) {
+          throw new Error("Failed to fetch user");
+        }
+        
+        return await res.json();
+      } catch (err) {
+        // Erro de rede ou outro - não lança exceção para não poluir o console
+        console.error("Erro ao buscar usuário:", err);
+        return null;
       }
-      
-      return await res.json();
     },
     retry: false,
+    // Só faz a query se houver token
+    enabled: hasToken,
+    // Não mostra erro no console se falhar
+    throwOnError: false,
   });
 
   const logout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    setHasToken(false);
     queryClient.setQueryData([api.auth.me.path], null);
-    toast({ title: "Logged out", description: "See you next time!" });
+    toast({ 
+      title: "Logout realizado", 
+      description: "Até logo!",
+      variant: "info"
+    });
     window.location.href = "/login";
   };
 
