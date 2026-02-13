@@ -1,0 +1,99 @@
+import { useInstagramPosts } from "@/hooks/use-dashboard";
+import { Sidebar } from "@/components/Sidebar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { Heart, MessageCircle, Eye, Play } from "lucide-react";
+
+export default function Content() {
+  const { data: posts, isLoading } = useInstagramPosts();
+
+  return (
+    <div className="flex min-h-screen bg-muted/30">
+      <Sidebar />
+      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+        <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
+          
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold font-display tracking-tight">Content Performance</h1>
+              <p className="text-muted-foreground mt-1">Detailed metrics for your recent posts.</p>
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-80 bg-muted animate-pulse rounded-2xl" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {posts?.map((post, index) => (
+                <Card 
+                  key={post.id} 
+                  className="overflow-hidden border-border/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="aspect-square bg-muted relative overflow-hidden">
+                    {post.mediaUrl ? (
+                      <img 
+                        src={post.mediaUrl} 
+                        alt={post.caption || "Instagram Post"} 
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-secondary">
+                        <span className="text-muted-foreground">No Media</span>
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3">
+                      <Badge variant="secondary" className="bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm border-0">
+                        {post.mediaType === 'VIDEO' || post.mediaType === 'REELS' ? <Play className="w-3 h-3 mr-1" /> : null}
+                        {post.mediaType}
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-5">
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[40px]">
+                      {post.caption || "No caption"}
+                    </p>
+                    
+                    <div className="grid grid-cols-3 gap-2 py-3 border-t border-border/50">
+                      <div className="flex flex-col items-center">
+                        <Heart className="w-4 h-4 text-rose-500 mb-1" />
+                        <span className="font-bold text-sm">{post.metrics?.likes || 0}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">Likes</span>
+                      </div>
+                      <div className="flex flex-col items-center border-l border-border/50">
+                        <MessageCircle className="w-4 h-4 text-blue-500 mb-1" />
+                        <span className="font-bold text-sm">{post.metrics?.comments || 0}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">Comments</span>
+                      </div>
+                      <div className="flex flex-col items-center border-l border-border/50">
+                        <Eye className="w-4 h-4 text-emerald-500 mb-1" />
+                        <span className="font-bold text-sm">{post.metrics?.reach || 0}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">Reach</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 text-xs text-muted-foreground text-center">
+                      Posted on {format(new Date(post.timestamp), 'MMM d, yyyy')}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+          
+          {posts?.length === 0 && (
+            <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl">
+              <p className="text-muted-foreground text-lg">No posts found. Try syncing data from Dashboard.</p>
+            </div>
+          )}
+
+        </div>
+      </main>
+    </div>
+  );
+}
