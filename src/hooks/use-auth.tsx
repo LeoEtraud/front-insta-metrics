@@ -28,8 +28,20 @@ function useLoginMutation() {
       });
 
       if (!res.ok) {
-        if (res.status === 401) throw new Error("Invalid credentials");
-        throw new Error("Login failed");
+        // Tenta obter a mensagem de erro do backend
+        let errorMessage = "Credenciais inválidas";
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // Se não conseguir parsear, usa mensagem padrão
+          if (res.status === 401) {
+            errorMessage = "Credenciais inválidas";
+          } else {
+            errorMessage = "Erro ao fazer login";
+          }
+        }
+        throw new Error(errorMessage);
       }
       return await res.json();
     },
@@ -51,10 +63,14 @@ function useLoginMutation() {
       });
     },
     onError: (error: Error) => {
+      // Verifica se é erro de conta OAuth sem senha
+      const isOAuthError = error.message.includes("login social") || error.message.includes("Google") || error.message.includes("Microsoft");
+      
       toast({
         title: "Erro no Login",
         description: error.message,
         variant: "destructive",
+        duration: isOAuthError ? 8000 : 5000, // Mensagem mais longa para erros OAuth
       });
     },
   });

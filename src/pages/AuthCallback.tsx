@@ -25,13 +25,21 @@ export default function AuthCallback() {
     });
 
     if (error) {
-      console.error("Erro OAuth:", error);
+      const errorMessage = searchParams.get("message");
+      const decodedMessage = errorMessage ? decodeURIComponent(errorMessage) : null;
+      
+      console.error("Erro OAuth:", error, decodedMessage);
+      
       toast({
         title: "Erro na autenticação",
-        description: "Falha ao fazer login com o provedor OAuth",
+        description: decodedMessage || "Falha ao fazer login com o provedor OAuth. Verifique se você já possui uma conta cadastrada.",
         variant: "destructive",
+        duration: 8000,
       });
-      navigate("/login", { replace: true });
+      
+      setTimeout(() => {
+        navigate("/login", { replace: true });
+      }, 2000);
       return;
     }
 

@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, 
   Instagram, 
@@ -26,8 +27,29 @@ import { getApiUrl } from "@/lib/api";
 export default function Login() {
   const { loginMutation, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  // Verifica se há erro na URL (vindo do OAuth)
+  useEffect(() => {
+    const error = searchParams.get("error");
+    const errorMessage = searchParams.get("message");
+    
+    if (error === "oauth_failed" && errorMessage) {
+      const decodedMessage = decodeURIComponent(errorMessage);
+      toast({
+        title: "Erro no login social",
+        description: decodedMessage,
+        variant: "destructive",
+        duration: 8000,
+      });
+      
+      // Remove os parâmetros da URL
+      navigate("/login", { replace: true });
+    }
+  }, [searchParams, navigate, toast]);
 
   useEffect(() => {
     if (user) {
