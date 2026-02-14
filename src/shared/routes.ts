@@ -2,7 +2,6 @@ import { z } from "zod";
 import { 
   loginSchema, 
   type User,
-  type Company,
   type InstagramPost,
   type DailyMetric
 } from "./schema";

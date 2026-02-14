@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type LoginRequest } from "../shared/routes";
-import { User } from "../shared/schema";
+import { api } from "../shared/routes";
+import { User, type LoginRequest } from "../shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { getApiUrl, getAuthHeaders } from "@/lib/api";
 import { translateErrorMessage } from "@/lib/utils";
@@ -129,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const { data: user, isLoading, error } = useQuery({
+  const { data: user, isLoading } = useQuery({
     queryKey: [api.auth.me.path],
     queryFn: async () => {
       // Verifica novamente se há token antes de fazer a requisição
