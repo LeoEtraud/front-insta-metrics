@@ -13,8 +13,8 @@ const ToastViewport = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Viewport
     ref={ref}
-    className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      className={cn(
+      "fixed bottom-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:right-0 sm:flex-col md:max-w-[420px]",
       className
     )}
     {...props}
@@ -23,19 +23,19 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
+      "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
   {
     variants: {
       variant: {
         default: "border bg-background text-foreground",
         success:
-          "border-green-500/50 bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100 shadow-green-500/20",
+          "border-green-600 bg-green-600 dark:bg-green-600 text-white dark:text-white shadow-green-500/20",
         warning:
           "border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20 text-yellow-900 dark:text-yellow-100 shadow-yellow-500/20",
         info:
           "border-blue-500/50 bg-blue-50 dark:bg-blue-950/20 text-blue-900 dark:text-blue-100 shadow-blue-500/20",
         destructive:
-          "border-red-500/50 bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-100 shadow-red-500/20",
+          "border-red-600 bg-red-600 dark:bg-red-600 text-white dark:text-white shadow-red-500/20",
       },
     },
     defaultVariants: {
@@ -95,13 +95,13 @@ const ToastClose = React.forwardRef<
       // Default
       "text-foreground/50 hover:text-foreground",
       // Success
-      "group-[.success]:text-green-700 dark:group-[.success]:text-green-300 group-[.success]:hover:text-green-900 dark:group-[.success]:hover:text-green-100 group-[.success]:focus:ring-green-400",
+      "group-[.success]:text-white dark:group-[.success]:text-white group-[.success]:hover:text-white dark:group-[.success]:hover:text-white group-[.success]:focus:ring-green-400",
       // Warning
       "group-[.warning]:text-yellow-700 dark:group-[.warning]:text-yellow-300 group-[.warning]:hover:text-yellow-900 dark:group-[.warning]:hover:text-yellow-100 group-[.warning]:focus:ring-yellow-400",
       // Info
       "group-[.info]:text-blue-700 dark:group-[.info]:text-blue-300 group-[.info]:hover:text-blue-900 dark:group-[.info]:hover:text-blue-100 group-[.info]:focus:ring-blue-400",
       // Destructive
-      "group-[.destructive]:text-red-700 dark:group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-900 dark:group-[.destructive]:hover:text-red-100 group-[.destructive]:focus:ring-red-400",
+      "group-[.destructive]:text-white dark:group-[.destructive]:text-white group-[.destructive]:hover:text-white dark:group-[.destructive]:hover:text-white group-[.destructive]:focus:ring-red-400",
       className
     )}
     toast-close=""

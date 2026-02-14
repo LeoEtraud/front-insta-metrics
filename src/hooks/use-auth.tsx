@@ -179,7 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     toast({ 
       title: "Logout realizado", 
       description: "Até logo!",
-      variant: "info"
+      variant: "destructive"
     });
     window.location.href = "/login";
   };
