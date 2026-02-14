@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rounded square with yellow color (matching the app design) -->
+  <rect width="32" height="32" rx="8" fill="#FACC15"/>
+  <!-- BarChart2 icon - simplified version matching lucide-react style -->
+  <g fill="#0F172A" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Left bar (shorter) -->
+    <rect x="7" y="18" width="4" height="8" rx="1" fill="#0F172A"/>
+    <!-- Middle bar (medium) -->
+    <rect x="13" y="14" width="4" height="12" rx="1" fill="#0F172A"/>
+    <!-- Right bar (tallest) -->
+    <rect x="19" y="10" width="4" height="16" rx="1" fill="#0F172A"/>
+  </g>
+</svg>
+
