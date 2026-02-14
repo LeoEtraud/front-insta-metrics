@@ -25,6 +25,7 @@ import {
 } from "recharts";
 import { format } from "date-fns";
 
+// COMPONENTE DE PÁGINA DO DASHBOARD - EXIBE RESUMO DE MÉTRICAS E GRÁFICOS DE TENDÊNCIAS
 export default function Dashboard() {
   const { data: summary, isLoading: isSummaryLoading } = useDashboardSummary();
   const { data: trends, isLoading: isTrendsLoading } = useDashboardTrends();

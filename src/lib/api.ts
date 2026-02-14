@@ -1,6 +1,7 @@
 // API configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+// CONSTRÓI URL COMPLETA DA API BASEADO NO PATH - USA PROXY EM DESENVOLVIMENTO
 export function getApiUrl(path: string): string {
   // If path already starts with http, return as is
   if (path.startsWith("http")) {
@@ -19,6 +20,7 @@ export function getApiUrl(path: string): string {
   return `${API_BASE_URL}${cleanPath}`;
 }
 
+// RETORNA HEADERS HTTP COM TOKEN DE AUTORIZAÇÃO DO LOCALSTORAGE
 export function getAuthHeaders(): Record<string, string> {
   const token = localStorage.getItem("accessToken");
   const headers: Record<string, string> = {

@@ -15,6 +15,7 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+// HOOK DE MUTAÇÃO PARA REALIZAR LOGIN - ENVIA CREDENCIAIS E GERENCIA TOKENS
 function useLoginMutation() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -79,6 +80,7 @@ function useLoginMutation() {
   });
 }
 
+// PROVIDER DE CONTEXTO DE AUTENTICAÇÃO - GERENCIA ESTADO DO USUÁRIO E TOKENS
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -168,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     throwOnError: false,
   });
 
+  // REALIZA LOGOUT - REMOVE TOKENS E REDIRECIONA PARA PÁGINA DE LOGIN
   const logout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -195,6 +198,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// HOOK PARA ACESSAR CONTEXTO DE AUTENTICAÇÃO - RETORNA USUÁRIO, LOADING E FUNÇÕES DE LOGIN/LOGOUT
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

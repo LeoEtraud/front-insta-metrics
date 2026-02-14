@@ -44,6 +44,7 @@ type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
 type Step = "email" | "code" | "reset";
 
+// COMPONENTE DE PÁGINA DE RECUPERAÇÃO DE SENHA - GERENCIA FLUXO DE REDEFINIÇÃO COM CÓDIGO DE 6 DÍGITOS
 export default function ForgotPassword() {
   const navigate = useNavigate();
   const { toast } = useToast();

@@ -24,6 +24,7 @@ import {
 import { motion } from "framer-motion";
 import { getApiUrl } from "@/lib/api";
 
+// COMPONENTE DE PÁGINA DE LOGIN - GERENCIA AUTENTICAÇÃO COM EMAIL/SENHA E OAUTH (GOOGLE/MICROSOFT)
 export default function Login() {
   const { loginMutation, user } = useAuth();
   const navigate = useNavigate();

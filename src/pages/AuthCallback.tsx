@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/shared/routes";
 
+// COMPONENTE DE CALLBACK OAUTH - PROCESSA TOKENS RECEBIDOS DO BACKEND E REDIRECIONA PARA DASHBOARD
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();

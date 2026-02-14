@@ -20,6 +20,7 @@ const NAV_ITEMS = [
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 
+// COMPONENTE DE MENU LATERAL - NAVEGAÇÃO PRINCIPAL COM LINKS E BOTÃO DE LOGOUT
 export function Sidebar() {
   const location = useLocation();
   const { logout, user } = useAuth();

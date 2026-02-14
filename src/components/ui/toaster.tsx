@@ -8,6 +8,7 @@ import {
   ToastViewport,
 } from "@/components/ui/toast"
 
+// COMPONENTE DE TOASTER - RENDERIZA NOTIFICAÇÕES TOAST NA TELA
 export function Toaster() {
   const { toasts } = useToast()
 

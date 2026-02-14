@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../shared/routes";
 import { getApiUrl, getAuthHeaders } from "@/lib/api";
 
-// Hook to fetch dashboard summary stats
+// HOOK PARA BUSCAR RESUMO DAS ESTATÍSTICAS DO DASHBOARD (SEGUIDORES, ALCANCE, POSTS, ENGAJAMENTO)
 export function useDashboardSummary() {
   return useQuery({
     queryKey: [api.dashboard.summary.path],
@@ -17,7 +17,7 @@ export function useDashboardSummary() {
   });
 }
 
-// Hook to fetch daily trends (chart data)
+// HOOK PARA BUSCAR TENDÊNCIAS DIÁRIAS (DADOS PARA GRÁFICOS)
 export function useDashboardTrends() {
   return useQuery({
     queryKey: [api.dashboard.trends.path],
@@ -32,7 +32,7 @@ export function useDashboardTrends() {
   });
 }
 
-// Hook to fetch instagram posts
+// HOOK PARA BUSCAR POSTS DO INSTAGRAM
 export function useInstagramPosts() {
   return useQuery({
     queryKey: [api.instagram.posts.path],
@@ -47,7 +47,7 @@ export function useInstagramPosts() {
   });
 }
 
-// Hook to sync data manually
+// HOOK PARA SINCRONIZAR DADOS DO INSTAGRAM MANUALMENTE - INVALIDA QUERIES PARA ATUALIZAR DADOS
 export function useSyncInstagram() {
   const queryClient = useQueryClient();
   return useMutation({

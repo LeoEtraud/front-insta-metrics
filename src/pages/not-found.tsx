@@ -3,6 +3,7 @@ import { AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
+// COMPONENTE DE PÁGINA 404 - EXIBE MENSAGEM DE PÁGINA NÃO ENCONTRADA
 export default function NotFound() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-muted/30">

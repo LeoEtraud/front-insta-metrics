@@ -1,11 +1,12 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+// COMBINA CLASSES CSS COM CLSX E TAILWIND MERGE PARA RESOLVER CONFLITOS
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Função para traduzir mensagens de erro do backend de inglês para português
+// TRADUZ MENSAGENS DE ERRO DO BACKEND DE INGLÊS PARA PORTUGUÊS
 export function translateErrorMessage(message: string): string {
   const translations: Record<string, string> = {
     "Invalid credentials": "Credenciais inválidas",

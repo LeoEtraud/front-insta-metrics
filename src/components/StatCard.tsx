@@ -14,6 +14,7 @@ interface StatCardProps {
   delay?: number; // animation delay in ms
 }
 
+// COMPONENTE DE CARTÃO DE ESTATÍSTICA - EXIBE VALOR, ÍCONE E TENDÊNCIA COM ANIMAÇÃO
 export function StatCard({ title, value, icon: Icon, trend, className, delay = 0 }: StatCardProps) {
   const isPositive = trend && trend.value >= 0;
 

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Heart, MessageCircle, Eye, Play } from "lucide-react";
 
+// COMPONENTE DE PÁGINA DE PERFORMANCE DE CONTEÚDO - EXIBE POSTS DO INSTAGRAM COM MÉTRICAS DETALHADAS
 export default function Content() {
   const { data: posts, isLoading } = useInstagramPosts();
 

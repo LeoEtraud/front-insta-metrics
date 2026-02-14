@@ -11,7 +11,7 @@ import Content from "@/pages/Content";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 
-// Protected Route Wrapper
+// WRAPPER DE ROTA PROTEGIDA - VERIFICA AUTENTICAÇÃO ANTES DE RENDERIZAR CONTEÚDO
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
@@ -30,6 +30,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// COMPONENTE DE ROTEAMENTO - DEFINE TODAS AS ROTAS DA APLICAÇÃO
 function Router() {
   return (
     <Routes>
@@ -79,6 +80,7 @@ function Router() {
   );
 }
 
+// COMPONENTE PRINCIPAL DA APLICAÇÃO - PROVÊ CONTEXTOS (QUERY CLIENT, AUTH) E ROTEAMENTO
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
