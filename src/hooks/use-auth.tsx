@@ -170,7 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     throwOnError: false,
   });
 
-  // REALIZA LOGOUT - REMOVE TOKENS E REDIRECIONA PARA PÁGINA DE LOGIN
+  // REALIZA LOGOUT - REMOVE TOKENS (O REDIRECIONAMENTO É FEITO AUTOMATICAMENTE PELO ProtectedRoute)
   const logout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -179,9 +179,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     toast({ 
       title: "Logout realizado", 
       description: "Até logo!",
-      variant: "destructive"
+      variant: "destructive",
+      duration: 2000
     });
-    window.location.href = "/login";
+    // O ProtectedRoute detecta automaticamente que user é null e redireciona para /login
+    // Isso evita reload completo da página e mantém o toast visível
   };
 
   return (
