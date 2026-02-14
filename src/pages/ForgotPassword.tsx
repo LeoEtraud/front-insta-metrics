@@ -341,6 +341,11 @@ export default function ForgotPassword() {
                     type="text"
                     placeholder="000000"
                     maxLength={6}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck="false"
+                    inputMode="numeric"
                     className="h-12 text-center text-2xl font-mono tracking-widest bg-muted/30 border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                     {...codeForm.register("code", {
                       onChange: (e) => {
