@@ -8,18 +8,19 @@ import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Loader2, 
-  Instagram, 
   Mail, 
   Lock, 
   Eye, 
   EyeOff,
   ArrowLeft,
-  CheckCircle2
+  CheckCircle2,
+  BarChart2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../shared/routes";
 import { getApiUrl } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { translateErrorMessage } from "@/lib/utils";
 
 const emailSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -79,7 +80,8 @@ export default function ForgotPassword() {
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || "Erro ao enviar código");
+        const errorMessage = error.message || "Erro ao enviar código";
+        throw new Error(translateErrorMessage(errorMessage));
       }
 
       setEmail(data.email);
@@ -92,7 +94,7 @@ export default function ForgotPassword() {
     } catch (error: any) {
       toast({
         title: "Erro",
-        description: error.message || "Falha ao enviar código",
+        description: translateErrorMessage(error.message || "Falha ao enviar código"),
         variant: "destructive",
       });
     } finally {
@@ -111,7 +113,8 @@ export default function ForgotPassword() {
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || "Código inválido");
+        const errorMessage = error.message || "Código inválido";
+        throw new Error(translateErrorMessage(errorMessage));
       }
 
       setCode(data.code);
@@ -124,7 +127,7 @@ export default function ForgotPassword() {
     } catch (error: any) {
       toast({
         title: "Erro",
-        description: error.message || "Código inválido ou expirado",
+        description: translateErrorMessage(error.message || "Código inválido ou expirado"),
         variant: "destructive",
       });
     } finally {
@@ -147,7 +150,8 @@ export default function ForgotPassword() {
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || "Erro ao redefinir senha");
+        const errorMessage = error.message || "Erro ao redefinir senha";
+        throw new Error(translateErrorMessage(errorMessage));
       }
 
       toast({
@@ -162,7 +166,7 @@ export default function ForgotPassword() {
     } catch (error: any) {
       toast({
         title: "Erro",
-        description: error.message || "Falha ao redefinir senha",
+        description: translateErrorMessage(error.message || "Falha ao redefinir senha"),
         variant: "destructive",
       });
     } finally {
@@ -177,7 +181,7 @@ export default function ForgotPassword() {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
-        className="hidden lg:flex lg:w-[65%] relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden"
+        className="hidden lg:flex lg:w-[65%] relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden select-none"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60 z-10" />
         
@@ -204,8 +208,8 @@ export default function ForgotPassword() {
             className="space-y-6"
           >
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center">
-                <Instagram className="w-7 h-7 text-slate-900" />
+              <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg">
+                <BarChart2 className="w-7 h-7 text-slate-900" />
               </div>
               <h1 className="text-3xl font-bold font-['Poppins'] text-white">Insta Metrics</h1>
             </div>
@@ -232,13 +236,13 @@ export default function ForgotPassword() {
         <div className="w-full max-w-md space-y-8">
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                <Lock className="w-6 h-6 text-primary" />
+            <div className="flex lg:hidden items-center justify-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg">
+                <BarChart2 className="w-6 h-6 text-slate-900" />
               </div>
               <h1 className="text-2xl font-bold font-['Poppins']">Insta Metrics</h1>
             </div>
-            <h2 className="text-2xl font-bold font-['Poppins']">Recuperar Senha</h2>
+            <h2 className="text-2xl font-bold font-['Poppins'] mb-2">Recuperar Senha</h2>
             <p className="text-sm text-muted-foreground">
               {step === "email" && "Digite seu email para receber o código de verificação"}
               {step === "code" && "Digite o código de 6 dígitos enviado para seu email"}
@@ -246,15 +250,22 @@ export default function ForgotPassword() {
             </p>
           </div>
 
-          {/* Indicador de progresso */}
-          <div className="flex items-center justify-center gap-2">
-            <div className={`h-2 w-16 rounded-full ${step === "email" ? "bg-primary" : "bg-primary/30"}`} />
-            <div className={`h-2 w-16 rounded-full ${step === "code" ? "bg-primary" : step === "reset" ? "bg-primary/30" : "bg-muted"}`} />
-            <div className={`h-2 w-16 rounded-full ${step === "reset" ? "bg-primary" : "bg-muted"}`} />
-          </div>
+          {/* Card do formulário */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/70 dark:to-slate-900/70 rounded-2xl p-6 shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/50 dark:border-slate-700/50"
+          >
+            {/* Indicador de progresso */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <div className={`h-2 w-16 rounded-full ${step === "email" ? "bg-primary" : "bg-primary/30"}`} />
+              <div className={`h-2 w-16 rounded-full ${step === "code" ? "bg-primary" : step === "reset" ? "bg-primary/30" : "bg-muted"}`} />
+              <div className={`h-2 w-16 rounded-full ${step === "reset" ? "bg-primary" : "bg-muted"}`} />
+            </div>
 
-          {/* Formulários */}
-          <AnimatePresence mode="wait">
+            {/* Formulários */}
+            <AnimatePresence mode="wait">
             {step === "email" && (
               <motion.form
                 key="email"
@@ -274,7 +285,7 @@ export default function ForgotPassword() {
                       id="email"
                       type="email"
                       placeholder="seu@email.com"
-                      className="h-12 pl-10 pr-4 bg-muted/30 border-border/50 focus:border-primary transition-colors"
+                      className="h-12 pl-10 pr-4 bg-muted/30 border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                       {...emailForm.register("email")}
                     />
                   </div>
@@ -330,7 +341,7 @@ export default function ForgotPassword() {
                     type="text"
                     placeholder="000000"
                     maxLength={6}
-                    className="h-12 text-center text-2xl font-mono tracking-widest bg-muted/30 border-border/50 focus:border-primary transition-colors"
+                    className="h-12 text-center text-2xl font-mono tracking-widest bg-muted/30 border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                     {...codeForm.register("code", {
                       onChange: (e) => {
                         const value = e.target.value.replace(/\D/g, "");
@@ -363,7 +374,7 @@ export default function ForgotPassword() {
                   )}
                 </Button>
 
-                <div className="text-center space-y-2">
+                <div className="text-center space-y-6">
                   <button
                     type="button"
                     onClick={() => setStep("email")}
@@ -410,7 +421,7 @@ export default function ForgotPassword() {
                       id="newPassword"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="h-12 pl-10 pr-12 bg-muted/30 border-border/50 focus:border-primary transition-colors"
+                      className="h-12 pl-10 pr-12 bg-muted/30 border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                       {...resetForm.register("newPassword")}
                     />
                     <button
@@ -442,7 +453,7 @@ export default function ForgotPassword() {
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="h-12 pl-10 pr-12 bg-muted/30 border-border/50 focus:border-primary transition-colors"
+                      className="h-12 pl-10 pr-12 bg-muted/30 border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                       {...resetForm.register("confirmPassword")}
                     />
                     <button
@@ -491,6 +502,7 @@ export default function ForgotPassword() {
               </motion.form>
             )}
           </AnimatePresence>
+          </motion.div>
         </div>
       </motion.div>
     </div>

@@ -11,7 +11,7 @@ export default function Content() {
   return (
     <div className="flex min-h-screen bg-muted/30">
       <Sidebar />
-      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+      <main className="flex-1 p-6 md:p-8 overflow-y-auto lg:pt-6 md:pt-20 pt-20">
         <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

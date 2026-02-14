@@ -11,7 +11,7 @@ export function useDashboardSummary() {
         headers: getAuthHeaders(),
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch summary");
+      if (!res.ok) throw new Error("Falha ao buscar resumo");
       return api.dashboard.summary.responses[200].parse(await res.json());
     },
   });
@@ -26,7 +26,7 @@ export function useDashboardTrends() {
         headers: getAuthHeaders(),
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch trends");
+      if (!res.ok) throw new Error("Falha ao buscar tendências");
       return api.dashboard.trends.responses[200].parse(await res.json());
     },
   });
@@ -41,7 +41,7 @@ export function useInstagramPosts() {
         headers: getAuthHeaders(),
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to fetch posts");
+      if (!res.ok) throw new Error("Falha ao buscar posts");
       return api.instagram.posts.responses[200].parse(await res.json());
     },
   });
@@ -57,7 +57,7 @@ export function useSyncInstagram() {
         headers: getAuthHeaders(),
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Failed to sync data");
+      if (!res.ok) throw new Error("Falha ao sincronizar dados");
       return await res.json();
     },
     onSuccess: () => {

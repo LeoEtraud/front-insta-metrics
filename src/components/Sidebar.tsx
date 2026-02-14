@@ -7,7 +7,7 @@ import {
   Image as ImageIcon, 
   Settings, 
   LogOut, 
-  Menu 
+  Menu
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -29,10 +29,10 @@ export function Sidebar() {
     <div className="flex flex-col h-full py-6">
       <div className="px-6 mb-8">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <BarChart2 className="w-5 h-5 text-primary" />
+          <div className="w-8 h-8 rounded-lg bg-yellow-400 flex items-center justify-center shadow-lg">
+            <BarChart2 className="w-5 h-5 text-slate-900" />
           </div>
-          <span className="text-xl font-bold font-display tracking-tight">InstaMetrics</span>
+          <span className="text-xl font-bold font-display tracking-tight">Insta Metrics</span>
         </div>
       </div>
 
@@ -72,8 +72,13 @@ export function Sidebar() {
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="shadow-md">
-              <Menu className="w-5 h-5" />
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-11 w-11 shadow-lg hover:shadow-xl bg-background/95 backdrop-blur-sm border-2 border-slate-300 dark:border-slate-600 hover:border-primary hover:bg-primary/5 transition-all duration-200 active:scale-95"
+              aria-label="Abrir menu de navegação"
+            >
+              <Menu className="w-6 h-6 text-foreground" />
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-72">

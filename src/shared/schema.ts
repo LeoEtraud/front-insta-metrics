@@ -71,8 +71,8 @@ export const POST_TYPES = {
 
 // Zod Schemas
 export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email("Email inválido").max(100, "O email deve ter no máximo 100 caracteres"),
+  password: z.string().min(6, "A senha deve conter pelo menos 6 caracteres").max(50, "A senha deve ter no máximo 50 caracteres"),
 });
 
 export type LoginRequest = z.infer<typeof loginSchema>;

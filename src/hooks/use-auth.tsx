@@ -4,6 +4,7 @@ import { api, type LoginRequest } from "../shared/routes";
 import { User } from "../shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { getApiUrl, getAuthHeaders } from "@/lib/api";
+import { translateErrorMessage } from "@/lib/utils";
 
 type AuthContextType = {
   user: User | null;
@@ -32,7 +33,9 @@ function useLoginMutation() {
         let errorMessage = "Credenciais inválidas";
         try {
           const errorData = await res.json();
-          errorMessage = errorData.message || errorMessage;
+          const backendMessage = errorData.message || errorMessage;
+          // Traduz mensagens em inglês para português
+          errorMessage = translateErrorMessage(backendMessage);
         } catch {
           // Se não conseguir parsear, usa mensagem padrão
           if (res.status === 401) {
@@ -148,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         
         if (!res.ok) {
-          throw new Error("Failed to fetch user");
+          throw new Error("Falha ao buscar usuário");
         }
         
         return await res.json();
@@ -195,7 +198,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
   return context;
 }
