@@ -1,5 +1,26 @@
-// API configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// CONFIGURAÇÃO DA URL DA API - DETECTA AMBIENTE E USA URL CORRETA
+const getApiBaseUrl = (): string => {
+  // Se VITE_API_URL estiver definido, usa ele (prioridade)
+  if (import.meta.env.VITE_API_URL) {
+    console.log('[API] Usando VITE_API_URL:', import.meta.env.VITE_API_URL);
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Em produção (Vercel), tenta detectar URL do backend
+  if (import.meta.env.PROD) {
+    // Se estiver no Vercel, assume que o backend está em back-insta-metrics.vercel.app
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://back-insta-metrics.vercel.app";
+    console.log('[API] Produção - Usando backend:', backendUrl);
+    return backendUrl;
+  }
+  
+  // Em desenvolvimento, usa localhost
+  console.log('[API] Desenvolvimento - Usando localhost:5000');
+  return "http://localhost:5000";
+};
+
+const API_BASE_URL = getApiBaseUrl();
+console.log('[API] URL base configurada:', API_BASE_URL);
 
 // CONSTRÓI URL COMPLETA DA API BASEADO NO PATH - USA PROXY EM DESENVOLVIMENTO
 export function getApiUrl(path: string): string {
