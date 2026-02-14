@@ -3,33 +3,38 @@
 // REGISTRA O SERVICE WORKER PARA HABILITAR FUNCIONALIDADES PWA
 export function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((registration) => {
-          console.log('[PWA] Service Worker registrado com sucesso:', registration.scope);
+    // REGISTRA IMEDIATAMENTE, NÃO ESPERA LOAD (EVITA TELA BRANCA)
+    navigator.serviceWorker
+      .register('/sw.js', { updateViaCache: 'none' })
+      .then((registration) => {
+        console.log('[PWA] Service Worker registrado com sucesso:', registration.scope);
 
-          // Verifica atualizações periodicamente
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            if (newWorker) {
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // Nova versão disponível
-                  console.log('[PWA] Nova versão disponível!');
-                  if (confirm('Nova versão disponível! Deseja atualizar?')) {
-                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                    window.location.reload();
-                  }
-                }
-              });
-            }
-          });
-        })
-        .catch((error) => {
-          console.error('[PWA] Erro ao registrar Service Worker:', error);
+        // VERIFICA ATUALIZAÇÕES A CADA 60 SEGUNDOS
+        setInterval(() => {
+          registration.update();
+        }, 60000);
+
+        // Verifica atualizações quando encontradas
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // NOVA VERSÃO DISPONÍVEL - FORÇA ATUALIZAÇÃO AUTOMÁTICA
+                console.log('[PWA] Nova versão disponível! Atualizando...');
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                // FORÇA RELOAD APÓS 1 SEGUNDO PARA DAR TEMPO DO SW ATIVAR
+                setTimeout(() => {
+                  window.location.reload();
+                }, 1000);
+              }
+            });
+          }
         });
-    });
+      })
+      .catch((error) => {
+        console.error('[PWA] Erro ao registrar Service Worker:', error);
+      });
   }
 }
 
