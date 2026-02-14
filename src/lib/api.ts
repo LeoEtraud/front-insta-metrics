@@ -38,7 +38,13 @@ export function getApiUrl(path: string): string {
     return cleanPath;
   }
   
-  return `${API_BASE_URL}${cleanPath}`;
+  // Remove trailing slash from API_BASE_URL and ensure clean path
+  const baseUrl = API_BASE_URL.endsWith("/") ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+  const finalPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+  
+  const finalUrl = `${baseUrl}${finalPath}`;
+  console.log('[API] URL construída:', finalUrl);
+  return finalUrl;
 }
 
 // RETORNA HEADERS HTTP COM TOKEN DE AUTORIZAÇÃO DO LOCALSTORAGE
