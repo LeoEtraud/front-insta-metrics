@@ -241,13 +241,13 @@ export default function Login() {
         transition={{ duration: 0.6 }}
         className="w-full lg:w-[35%] flex items-center justify-center p-6 lg:p-12 bg-background"
       >
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md">
           {/* Logo e nome do sistema - Tablet e Mobile */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="flex lg:hidden items-center justify-center gap-3 mb-6"
+            className="flex lg:hidden items-center justify-center gap-3 mb-12 md:mb-16"
           >
             <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg">
               <BarChart2 className="w-6 h-6 text-slate-900" />
@@ -275,7 +275,7 @@ export default function Login() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/70 dark:to-slate-900/70 rounded-2xl p-6 shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/50 dark:border-slate-700/50"
+            className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/70 dark:to-slate-900/70 rounded-2xl p-6 shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/50 dark:border-slate-700/50 mt-12 md:mt-16 lg:mt-8"
           >
             {/* Formulário */}
             <motion.form

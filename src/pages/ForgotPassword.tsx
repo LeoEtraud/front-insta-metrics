@@ -234,10 +234,10 @@ export default function ForgotPassword() {
         transition={{ duration: 0.6 }}
         className="w-full lg:w-[35%] flex items-center justify-center p-6 lg:p-12 bg-background overflow-y-auto"
       >
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="flex lg:hidden items-center justify-center gap-3 mb-6">
+            <div className="flex lg:hidden items-center justify-center gap-3 mb-12 md:mb-16">
               <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg">
                 <BarChart2 className="w-6 h-6 text-slate-900" />
               </div>
@@ -256,7 +256,7 @@ export default function ForgotPassword() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/70 dark:to-slate-900/70 rounded-2xl p-6 shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/50 dark:border-slate-700/50"
+            className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/70 dark:to-slate-900/70 rounded-2xl p-6 shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-200/50 dark:border-slate-700/50 mt-12 md:mt-16 lg:mt-8"
           >
             {/* Indicador de progresso */}
             <div className="flex items-center justify-center gap-2 mb-6">
@@ -312,7 +312,7 @@ export default function ForgotPassword() {
                   )}
                 </Button>
 
-                <div className="text-center">
+                <div className="text-center mt-10 md:mt-12">
                   <Link
                     to="/login"
                     className="text-sm text-primary hover:underline flex items-center justify-center gap-2"
@@ -388,7 +388,7 @@ export default function ForgotPassword() {
                   >
                     Reenviar código
                   </button>
-                  <div>
+                  <div className="mt-10 md:mt-12">
                     <Link
                       to="/login"
                       className="text-sm text-muted-foreground hover:underline flex items-center justify-center gap-2"
@@ -496,7 +496,7 @@ export default function ForgotPassword() {
                   )}
                 </Button>
 
-                <div className="text-center">
+                <div className="text-center mt-10 md:mt-12">
                   <Link
                     to="/login"
                     className="text-sm text-muted-foreground hover:underline flex items-center justify-center gap-2"
