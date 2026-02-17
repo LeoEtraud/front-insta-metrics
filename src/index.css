@@ -101,22 +101,17 @@
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
 
-/* Animação de rotação lenta */
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
-}
-
 /* Bloqueio de orientação horizontal (landscape) em dispositivos móveis */
 @media screen and (max-width: 768px) and (orientation: landscape) {
   body {
     overflow: hidden;
   }
   
+  #root {
+    display: none;
+  }
+  
+  /* Tela em branco quando em landscape */
   body::before {
     content: '';
     position: fixed;
@@ -126,32 +121,6 @@
     height: 100%;
     background: hsl(var(--background));
     z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  body::after {
-    content: '📱 Por favor, gire seu dispositivo para o modo retrato (vertical)';
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10000;
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    padding: 1.5rem 2rem;
-    border-radius: 1rem;
-    font-size: 1.125rem;
-    font-weight: 600;
-    text-align: center;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    max-width: 90%;
-    line-height: 1.6;
-  }
-  
-  #root {
-    display: none;
   }
 }
 
