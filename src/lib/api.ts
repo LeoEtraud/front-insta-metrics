@@ -8,8 +8,8 @@ const getApiBaseUrl = (): string => {
   
   // Em produção (Vercel), tenta detectar URL do backend
   if (import.meta.env.PROD) {
-    // Se estiver no Vercel, assume que o backend está em back-insta-metrics.vercel.app
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://back-insta-metrics.vercel.app";
+    // Se estiver no Vercel, usa a URL do backend no Render
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://back-insta-metrics.onrender.com";
     console.log('[API] Produção - Usando backend:', backendUrl);
     return backendUrl;
   }
