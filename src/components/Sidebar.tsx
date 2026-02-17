@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -25,6 +25,31 @@ export function Sidebar() {
   const location = useLocation();
   const { logout, user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Detecta scroll para ocultar botão do menu no mobile
+  useEffect(() => {
+    const handleScroll = () => {
+      // Verifica se está em mobile (largura <= 1024px que é o breakpoint lg)
+      const isMobile = window.innerWidth < 1024;
+      if (!isMobile) return;
+
+      // Obtém a posição do scroll
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      
+      // Oculta o botão quando o scroll for maior que 50px
+      setIsScrolled(scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Verifica inicialmente
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const NavContent = () => (
     <div className="flex flex-col h-full py-6">
@@ -70,7 +95,10 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Trigger */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className={cn(
+        "lg:hidden fixed top-4 left-4 z-50 transition-all duration-300",
+        isScrolled ? "opacity-0 pointer-events-none -translate-y-2" : "opacity-100 pointer-events-auto translate-y-0"
+      )}>
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button 
