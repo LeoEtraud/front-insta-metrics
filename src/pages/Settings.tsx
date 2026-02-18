@@ -206,8 +206,6 @@ export default function Settings() {
     setIsDeleteDialogOpen(true);
   };
 
-  const roleLabel = watch("role") === "admin" ? "Admin" : "Cliente";
-
   return (
     <div className="flex min-h-screen bg-muted/30">
       <Sidebar />
