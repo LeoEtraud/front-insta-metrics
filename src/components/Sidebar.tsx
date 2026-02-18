@@ -5,27 +5,164 @@ import {
   LayoutDashboard, 
   BarChart2, 
   Image as ImageIcon, 
-  Settings, 
+  Users, 
   LogOut, 
-  Menu
+  Menu,
+  Edit,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useUpdateUser } from "@/hooks/use-users";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useState, useEffect } from "react";
 
-const NAV_ITEMS = [
+const NAV_ITEMS: Array<{
+  label: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+  adminOnly?: boolean;
+}> = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Content", href: "/content", icon: ImageIcon },
   { label: "Analytics", href: "/analytics", icon: BarChart2 },
-  { label: "Settings", href: "/settings", icon: Settings },
+  { label: "Usuários", href: "/settings", icon: Users, adminOnly: true },
 ];
+
+// VALIDAÇÃO DO PADRÃO DO INSTAGRAM USERNAME
+const instagramUsernameSchema = z
+  .string()
+  .optional()
+  .nullable()
+  .refine(
+    (val) => {
+      if (!val || val.trim() === "") return true; // Permite vazio
+      // Remove o @ se presente
+      const username = val.replace(/^@/, "").trim();
+      // Verifica se contém apenas caracteres permitidos (a-z, 0-9, ., _)
+      const validPattern = /^[a-z0-9._]+$/;
+      if (!validPattern.test(username)) return false;
+      // Não pode começar ou terminar com ponto ou underscore
+      if (/^[._]|[._]$/.test(username)) return false;
+      // Não pode ter pontos ou underscores consecutivos
+      if (/[._]{2,}/.test(username)) return false;
+      // Deve ter pelo menos 1 caractere alfanumérico
+      if (!/[a-z0-9]/.test(username)) return false;
+      return true;
+    },
+    {
+      message:
+        "Nome de usuário do Instagram inválido. Use apenas letras minúsculas, números, ponto (.) e underscore (_). Não pode começar ou terminar com ponto ou underscore.",
+    }
+  );
+
+// SCHEMA DE VALIDAÇÃO PARA EDIÇÃO DE PERFIL
+const profileFormSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "Senha deve ter no mínimo 6 caracteres").optional().or(z.literal("")),
+  name: z.string().min(1, "Nome é obrigatório"),
+  instagramUsername: instagramUsernameSchema,
+});
+
+type ProfileFormData = z.infer<typeof profileFormSchema>;
 
 // COMPONENTE DE MENU LATERAL - NAVEGAÇÃO PRINCIPAL COM LINKS E BOTÃO DE LOGOUT
 export function Sidebar() {
   const location = useLocation();
-  const { logout, user } = useAuth();
+  const { logout, user, isAdmin, isClient } = useAuth();
   const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
+  const updateMutation = useUpdateUser();
+  const { toast } = useToast();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      email: user?.email || "",
+      name: user?.name || "",
+      instagramUsername: "",
+      password: "",
+    },
+  });
+
+  // Atualiza valores do formulário quando o usuário muda
+  useEffect(() => {
+    if (user) {
+      setValue("email", user.email);
+      setValue("name", user.name);
+      setValue("password", "");
+      // Só inicializa instagramUsername se for admin
+      if (isAdmin()) {
+        setValue("instagramUsername", user.instagramUsername || "");
+      }
+    }
+  }, [user, setValue, isAdmin]);
+
+  const onProfileSubmit = async (data: ProfileFormData) => {
+    if (!user) return;
+    
+    try {
+      const updateData: any = {
+        email: data.email,
+        password: data.password || undefined,
+        name: data.name,
+      };
+      
+      // Cliente não pode alterar instagramUsername
+      if (isAdmin()) {
+        updateData.instagramUsername = data.instagramUsername || undefined;
+      }
+      
+      await updateMutation.mutateAsync({
+        id: user.id,
+        data: updateData,
+      });
+      toast({
+        title: "Sucesso",
+        description: "Perfil atualizado com sucesso!",
+        variant: "success",
+      });
+      setIsProfileDialogOpen(false);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Falha ao atualizar perfil",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openProfileDialog = () => {
+    if (user) {
+      setValue("email", user.email);
+      setValue("name", user.name);
+      setValue("password", "");
+      // Só inicializa instagramUsername se for admin
+      if (isAdmin()) {
+        setValue("instagramUsername", user.instagramUsername || "");
+      }
+      setIsProfileDialogOpen(true);
+    }
+  };
 
   // Detecta scroll para ocultar botão do menu no mobile
   useEffect(() => {
@@ -63,7 +200,13 @@ export function Sidebar() {
       </div>
 
       <div className="flex-1 px-4 space-y-2">
-        {NAV_ITEMS.map((item) => {
+        {NAV_ITEMS.filter((item) => {
+          // Filtra Usuários para clientes
+          if (item.adminOnly && !isAdmin()) {
+            return false;
+          }
+          return true;
+        }).map((item) => {
           const isActive = location.pathname === item.href;
           return (
             <Link key={item.href} to={item.href} className={cn(
@@ -80,13 +223,29 @@ export function Sidebar() {
       </div>
 
       <div className="px-6 mt-auto">
-        <div className="bg-card border border-border/50 rounded-2xl p-4 mb-4 shadow-sm">
-          <p className="text-sm font-medium truncate">{user?.name}</p>
-          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+        <div 
+          className="bg-card border border-border/50 rounded-2xl p-4 mb-4 shadow-sm cursor-pointer hover:bg-muted/50 transition-colors group relative"
+          onClick={openProfileDialog}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">
+                {isClient() && user?.instagramUsername 
+                  ? user.instagramUsername 
+                  : user?.name}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+            </div>
+            <Edit className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0 ml-2" />
+          </div>
         </div>
-        <Button variant="outline" className="w-full justify-start gap-2 border-border/60" onClick={logout}>
+        <Button 
+          variant="outline" 
+          className="w-full justify-start gap-2 border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 hover:border-red-300 dark:hover:border-red-800" 
+          onClick={logout}
+        >
           <LogOut className="w-4 h-4" />
-          Log Out
+          Sair
         </Button>
       </div>
     </div>
@@ -120,6 +279,105 @@ export function Sidebar() {
       <aside className="hidden lg:flex flex-col w-72 border-r border-border bg-card/50 backdrop-blur-xl h-screen sticky top-0">
         <NavContent />
       </aside>
+
+      {/* Dialog de Edição de Perfil */}
+      <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Perfil</DialogTitle>
+            <DialogDescription>
+              Atualize seus dados de acesso
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(onProfileSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="profile-name">Nome Completo *</Label>
+              <Input
+                id="profile-name"
+                autoComplete="off"
+                className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-sm text-destructive">{errors.name.message}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-email">Email *</Label>
+              <Input
+                id="profile-email"
+                type="email"
+                autoComplete="off"
+                className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email.message}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-password">Nova Senha (deixe em branco para manter)</Label>
+              <Input
+                id="profile-password"
+                type="password"
+                autoComplete="new-password"
+                className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                {...register("password")}
+                placeholder="Deixe em branco para manter a senha atual"
+              />
+              {errors.password && (
+                <p className="text-sm text-destructive">{errors.password.message}</p>
+              )}
+            </div>
+            {isAdmin() && (
+              <div className="space-y-2">
+                <Label htmlFor="profile-instagramUsername">Nome de usuário (Instagram)</Label>
+                <Input
+                  id="profile-instagramUsername"
+                  autoComplete="off"
+                  className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  {...register("instagramUsername")}
+                  placeholder="@username"
+                  onChange={(e) => {
+                    // Normaliza: remove @, converte para minúsculas, remove espaços
+                    const normalized = e.target.value
+                      .replace(/^@/, "")
+                      .toLowerCase()
+                      .replace(/\s+/g, "_")
+                      .replace(/[^a-z0-9._]/g, "");
+                    setValue("instagramUsername", normalized);
+                  }}
+                />
+                {errors.instagramUsername && (
+                  <p className="text-sm text-destructive">{errors.instagramUsername.message}</p>
+                )}
+              </div>
+            )}
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsProfileDialogOpen(false);
+                  reset();
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={updateMutation.isPending}>
+                {updateMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  "Salvar"
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../shared/routes";
-import { User, type LoginRequest } from "../shared/schema";
+import { User, type LoginRequest, USER_ROLES } from "../shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { getApiUrl, getAuthHeaders } from "@/lib/api";
 import { translateErrorMessage } from "@/lib/utils";
@@ -11,6 +11,8 @@ type AuthContextType = {
   isLoading: boolean;
   loginMutation: ReturnType<typeof useLoginMutation>;
   logout: () => void;
+  isAdmin: () => boolean;
+  isClient: () => boolean;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -186,6 +188,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Isso evita reload completo da página e mantém o toast visível
   };
 
+  // VERIFICA SE O USUÁRIO É ADMINISTRADOR
+  const isAdmin = () => {
+    return user?.role === USER_ROLES.ADMIN;
+  };
+
+  // VERIFICA SE O USUÁRIO É CLIENTE
+  const isClient = () => {
+    return user?.role === USER_ROLES.CLIENT;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -193,6 +205,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         loginMutation,
         logout,
+        isAdmin,
+        isClient,
       }}
     >
       {children}

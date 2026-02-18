@@ -8,6 +8,7 @@ import ForgotPassword from "@/pages/ForgotPassword";
 import AuthCallback from "@/pages/AuthCallback";
 import Dashboard from "@/pages/Dashboard";
 import Content from "@/pages/Content";
+import Settings from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 
@@ -25,6 +26,29 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// WRAPPER DE ROTA ADMINISTRATIVA - VERIFICA SE O USUÁRIO É ADMIN
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading, isAdmin } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin()) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -67,7 +91,7 @@ function Router() {
         path="/settings"
         element={
           <ProtectedRoute>
-            <Dashboard /> {/* Reusing dashboard for demo */}
+            <Settings />
           </ProtectedRoute>
         }
       />
