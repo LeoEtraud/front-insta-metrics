@@ -41,7 +41,6 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
-import { USER_ROLES } from "@/shared/schema";
 import type { User } from "@/shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -151,7 +150,7 @@ export default function Settings() {
           email: data.email,
           password: data.password,
           name: data.name,
-          instagramUsername: data.instagramUsername,
+          instagramUsername: data.instagramUsername || undefined,
           role: data.role,
         });
         toast({

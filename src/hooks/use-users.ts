@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../shared/routes";
 import { getApiUrl, getAuthHeaders } from "@/lib/api";
-import type { User } from "../shared/schema";
 import { buildUrl } from "../shared/routes";
 
 // HOOK PARA LISTAR TODOS OS USUÁRIOS

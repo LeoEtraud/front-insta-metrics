@@ -31,29 +31,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// WRAPPER DE ROTA ADMINISTRATIVA - VERIFICA SE O USUÁRIO É ADMIN
-function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { user, isLoading, isAdmin } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (!isAdmin()) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <>{children}</>;
-}
-
 // COMPONENTE DE ROTEAMENTO - DEFINE TODAS AS ROTAS DA APLICAÇÃO
 function Router() {
   return (
