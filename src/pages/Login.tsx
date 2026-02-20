@@ -79,40 +79,61 @@ export default function Login() {
         transition={{ duration: 0.6 }}
         className="hidden lg:flex lg:w-[65%] relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden select-none"
       >
+        {/* Padrão de pontos sutil */}
+        <div 
+          className="absolute inset-0 z-0 opacity-30"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(253, 224, 71, 0.15) 1px, transparent 0)`,
+            backgroundSize: '32px 32px',
+          }}
+        />
         {/* Overlay com gradiente escuro */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/60 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/30 to-black/50 z-10" />
         
         {/* Elementos decorativos animados */}
         <div className="absolute inset-0 z-0">
           <motion.div
             animate={{
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, 0],
+              scale: [1, 1.15, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-32 left-32 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.25, 1],
+              opacity: [0.4, 0.7, 0.4],
             }}
             transition={{
               duration: 20,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
+              delay: 1
             }}
-            className="absolute top-20 left-20 w-72 h-72 bg-yellow-400/10 rounded-full blur-3xl"
+            className="absolute bottom-32 right-32 w-[28rem] h-[28rem] bg-yellow-500/15 rounded-full blur-3xl"
           />
           <motion.div
             animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, -5, 0],
+              scale: [1, 1.1, 1],
+              opacity: [0.3, 0.5, 0.3],
             }}
             transition={{
-              duration: 25,
+              duration: 18,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: 0.5
+              delay: 2
             }}
-            className="absolute bottom-20 right-20 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"
           />
         </div>
 
         {/* Ilustração SVG de métricas/dashboard */}
-        <div className="absolute inset-0 z-5 flex items-center justify-center opacity-20">
+        <div className="absolute inset-0 z-5 flex items-center justify-center opacity-[0.12]">
           <svg
             width="600"
             height="600"
@@ -145,42 +166,46 @@ export default function Login() {
         </div>
 
         {/* Conteúdo textual */}
-        <div className="relative z-20 flex flex-col justify-center px-16 text-white">
+        <div className="relative z-20 flex flex-col justify-center min-h-full py-16 px-12 lg:px-20 xl:px-24 text-white">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="space-y-6"
+            className="space-y-6 max-w-xl"
           >
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg">
-                <BarChart2 className="w-7 h-7 text-slate-900" />
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-14 h-14 bg-amber-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-400/25 flex-shrink-0 ring-2 ring-amber-400/30">
+                <BarChart2 className="w-8 h-8 text-slate-900" />
               </div>
-              <h1 className="text-3xl font-bold font-['Poppins'] text-white">Insta Metrics</h1>
+              <div>
+                <h1 className="text-3xl font-bold font-['Poppins'] text-white tracking-tight">Insta Metrics</h1>
+                <div className="h-0.5 w-16 bg-amber-400/60 mt-1 rounded-full" />
+              </div>
             </div>
             
-            <h2 className="text-5xl font-bold font-['Poppins'] leading-tight text-white">
-              Transforme seus dados em
-              <span className="text-yellow-400 block mt-2">crescimento digital</span>
+            <h2 className="text-4xl xl:text-5xl font-bold font-['Poppins'] leading-[1.2] text-white mt-16 mb-16 drop-shadow-sm">
+              Mais que números: inteligência que gera
+              <span className="text-amber-400 block mt-3 bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">Crescimento Digital</span>
             </h2>
             
-            <p className="text-xl text-slate-300 leading-relaxed max-w-lg">
+            <p className="text-lg xl:text-xl text-slate-300 leading-relaxed max-w-lg pt-2">
               Analise métricas, acompanhe o desempenho e tome decisões baseadas em dados para impulsionar sua presença no Instagram.
             </p>
 
             {/* Features destacadas */}
-            <div className="grid grid-cols-2 gap-6 mt-12">
+            <div className="grid grid-cols-2 gap-4 mt-12">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 }}
-                className="flex items-center gap-3"
+                whileHover={{ scale: 1.02, x: 4 }}
+                className="flex items-center gap-4 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-amber-400/20 transition-all duration-300"
               >
-                <div className="w-10 h-10 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-yellow-400" />
+                <div className="w-11 h-11 bg-amber-400/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-5 h-5 text-amber-400" />
                 </div>
                 <div>
-                  <p className="font-semibold">Análise em Tempo Real</p>
+                  <p className="font-semibold text-white">Análise em Tempo Real</p>
                   <p className="text-sm text-slate-400">Métricas atualizadas</p>
                 </div>
               </motion.div>
@@ -189,13 +214,14 @@ export default function Login() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.6 }}
-                className="flex items-center gap-3"
+                whileHover={{ scale: 1.02, x: 4 }}
+                className="flex items-center gap-4 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-amber-400/20 transition-all duration-300"
               >
-                <div className="w-10 h-10 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-yellow-400" />
+                <div className="w-11 h-11 bg-amber-400/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <BarChart3 className="w-5 h-5 text-amber-400" />
                 </div>
                 <div>
-                  <p className="font-semibold">Dashboards Intuitivos</p>
+                  <p className="font-semibold text-white">Dashboards Intuitivos</p>
                   <p className="text-sm text-slate-400">Visualizações claras</p>
                 </div>
               </motion.div>
@@ -204,13 +230,14 @@ export default function Login() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.7 }}
-                className="flex items-center gap-3"
+                whileHover={{ scale: 1.02, x: 4 }}
+                className="flex items-center gap-4 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-amber-400/20 transition-all duration-300"
               >
-                <div className="w-10 h-10 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 text-yellow-400" />
+                <div className="w-11 h-11 bg-amber-400/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-amber-400" />
                 </div>
                 <div>
-                  <p className="font-semibold">Engajamento</p>
+                  <p className="font-semibold text-white">Engajamento</p>
                   <p className="text-sm text-slate-400">Acompanhe seguidores</p>
                 </div>
               </motion.div>
@@ -219,13 +246,14 @@ export default function Login() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.8 }}
-                className="flex items-center gap-3"
+                whileHover={{ scale: 1.02, x: 4 }}
+                className="flex items-center gap-4 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-amber-400/20 transition-all duration-300"
               >
-                <div className="w-10 h-10 bg-yellow-400/20 rounded-lg flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-yellow-400" />
+                <div className="w-11 h-11 bg-amber-400/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Zap className="w-5 h-5 text-amber-400" />
                 </div>
                 <div>
-                  <p className="font-semibold">Performance</p>
+                  <p className="font-semibold text-white">Performance</p>
                   <p className="text-sm text-slate-400">Otimize resultados</p>
                 </div>
               </motion.div>
