@@ -208,11 +208,14 @@ export default function ForgotPassword() {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="space-y-6"
           >
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg">
-                <BarChart2 className="w-7 h-7 text-slate-900" />
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-14 h-14 bg-amber-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-400/25 flex-shrink-0 ring-2 ring-amber-400/30">
+                <BarChart2 className="w-8 h-8 text-slate-900" />
               </div>
-              <h1 className="text-3xl font-bold font-['Poppins'] text-white">Insta Metrics</h1>
+              <div>
+                <h1 className="text-3xl font-bold font-['Poppins'] text-white tracking-tight">Insta Metrics</h1>
+                <div className="h-0.5 w-16 bg-amber-400/60 mt-1 rounded-full" />
+              </div>
             </div>
             
             <h2 className="text-5xl font-bold font-['Poppins'] leading-tight text-white">
@@ -237,11 +240,14 @@ export default function ForgotPassword() {
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="flex lg:hidden items-center justify-center gap-3 mb-12 md:mb-16">
-              <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg">
-                <BarChart2 className="w-6 h-6 text-slate-900" />
+            <div className="flex lg:hidden items-center justify-center gap-4 mb-12 md:mb-16">
+              <div className="w-14 h-14 bg-amber-400 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-400/25 flex-shrink-0 ring-2 ring-amber-400/30">
+                <BarChart2 className="w-8 h-8 text-slate-900" />
               </div>
-              <h1 className="text-2xl font-bold font-['Poppins']">Insta Metrics</h1>
+              <div className="flex flex-col items-center">
+                <h1 className="text-2xl font-bold font-['Poppins'] tracking-tight">Insta Metrics</h1>
+                <div className="h-0.5 w-12 bg-amber-400/60 mt-1 rounded-full" />
+              </div>
             </div>
             <h2 className="text-2xl font-bold font-['Poppins'] mb-2">Recuperar Senha</h2>
             <p className="text-sm text-muted-foreground">

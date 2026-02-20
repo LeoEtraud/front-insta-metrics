@@ -100,9 +100,11 @@ export function useUpdateUser() {
       }
       return api.users.update.responses[200].parse(await res.json());
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: [api.users.list.path] });
       queryClient.invalidateQueries({ queryKey: [api.users.get.path, variables.id] });
+      // Recarrega dados do usuário autenticado para refletir alterações no perfil
+      queryClient.invalidateQueries({ queryKey: [api.auth.me.path] });
     },
   });
 }
