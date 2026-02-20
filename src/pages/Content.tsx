@@ -3,7 +3,15 @@ import { Sidebar } from "@/components/Sidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { Heart, MessageCircle, Eye, Play } from "lucide-react";
+
+const mediaTypeLabels: Record<string, string> = {
+  IMAGE: "Imagem",
+  VIDEO: "Vídeo",
+  REELS: "Reels",
+  CAROUSEL_ALBUM: "Carrossel",
+};
 
 // COMPONENTE DE PÁGINA DE PERFORMANCE DE CONTEÚDO - EXIBE POSTS DO INSTAGRAM COM MÉTRICAS DETALHADAS
 export default function Content() {
@@ -17,8 +25,8 @@ export default function Content() {
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold font-display tracking-tight">Content Performance</h1>
-              <p className="text-muted-foreground mt-1">Detailed metrics for your recent posts.</p>
+              <h1 className="text-3xl font-bold font-display tracking-tight">Desempenho do Conteúdo</h1>
+              <p className="text-muted-foreground mt-1">Métricas detalhadas dos seus posts recentes.</p>
             </div>
           </div>
 
@@ -40,46 +48,46 @@ export default function Content() {
                     {post.mediaUrl ? (
                       <img 
                         src={post.mediaUrl} 
-                        alt={post.caption || "Instagram Post"} 
+                        alt={post.caption || "Post do Instagram"} 
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-secondary">
-                        <span className="text-muted-foreground">No Media</span>
+                        <span className="text-muted-foreground">Sem Mídia</span>
                       </div>
                     )}
                     <div className="absolute top-3 right-3">
                       <Badge variant="secondary" className="bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm border-0">
                         {post.mediaType === 'VIDEO' || post.mediaType === 'REELS' ? <Play className="w-3 h-3 mr-1" /> : null}
-                        {post.mediaType}
+                        {mediaTypeLabels[post.mediaType] || post.mediaType}
                       </Badge>
                     </div>
                   </div>
                   <CardContent className="p-5">
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[40px]">
-                      {post.caption || "No caption"}
+                      {post.caption || "Sem legenda"}
                     </p>
                     
                     <div className="grid grid-cols-3 gap-2 py-3 border-t border-border/50">
                       <div className="flex flex-col items-center">
                         <Heart className="w-4 h-4 text-rose-500 mb-1" />
                         <span className="font-bold text-sm">{post.metrics?.likes || 0}</span>
-                        <span className="text-[10px] text-muted-foreground uppercase">Likes</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">Curtidas</span>
                       </div>
                       <div className="flex flex-col items-center border-l border-border/50">
                         <MessageCircle className="w-4 h-4 text-blue-500 mb-1" />
                         <span className="font-bold text-sm">{post.metrics?.comments || 0}</span>
-                        <span className="text-[10px] text-muted-foreground uppercase">Comments</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">Comentários</span>
                       </div>
                       <div className="flex flex-col items-center border-l border-border/50">
                         <Eye className="w-4 h-4 text-emerald-500 mb-1" />
                         <span className="font-bold text-sm">{post.metrics?.reach || 0}</span>
-                        <span className="text-[10px] text-muted-foreground uppercase">Reach</span>
+                        <span className="text-[10px] text-muted-foreground uppercase">Alcance</span>
                       </div>
                     </div>
                     
                     <div className="mt-3 text-xs text-muted-foreground text-center">
-                      Posted on {format(new Date(post.timestamp), 'MMM d, yyyy')}
+                      Publicado em {format(new Date(post.timestamp), "d 'de' MMM 'de' yyyy", { locale: ptBR })}
                     </div>
                   </CardContent>
                 </Card>
@@ -89,7 +97,7 @@ export default function Content() {
           
           {posts?.length === 0 && (
             <div className="text-center py-20 border-2 border-dashed border-border rounded-3xl">
-              <p className="text-muted-foreground text-lg">No posts found. Try syncing data from Dashboard.</p>
+              <p className="text-muted-foreground text-lg">Nenhum post encontrado. Tente sincronizar os dados pelo Dashboard.</p>
             </div>
           )}
 
