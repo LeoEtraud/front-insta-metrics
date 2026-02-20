@@ -40,7 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, Eye, EyeOff } from "lucide-react";
 import type { User } from "@/shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -97,6 +97,8 @@ export default function Settings() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showCreatePassword, setShowCreatePassword] = useState(false);
+  const [showEditPassword, setShowEditPassword] = useState(false);
 
   const {
     register,
@@ -135,6 +137,7 @@ export default function Settings() {
           description: "Usuário atualizado com sucesso!",
           variant: "success",
         });
+        setShowEditPassword(false);
         setIsEditDialogOpen(false);
       } else {
         // Criar
@@ -158,6 +161,7 @@ export default function Settings() {
           description: "Usuário criado com sucesso!",
           variant: "success",
         });
+        setShowCreatePassword(false);
         setIsCreateDialogOpen(false);
       }
       reset();
@@ -229,7 +233,10 @@ export default function Settings() {
                       Crie, edite e gerencie usuários do sistema
                     </CardDescription>
                   </div>
-                  <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                  <Dialog open={isCreateDialogOpen} onOpenChange={(open) => {
+                      setIsCreateDialogOpen(open);
+                      if (!open) setShowCreatePassword(false);
+                    }}>
                     <DialogTrigger asChild>
                       <Button onClick={() => reset()}>
                         <Plus className="w-4 h-4 mr-2" />
@@ -273,14 +280,29 @@ export default function Settings() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="password">Senha *</Label>
-                          <Input
-                            id="password"
-                            type="password"
-                            autoComplete="new-password"
-                            className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                            {...register("password")}
-                            placeholder="Mínimo 6 caracteres"
-                          />
+                          <div className="relative">
+                            <Input
+                              id="password"
+                              type={showCreatePassword ? "text" : "password"}
+                              autoComplete="new-password"
+                              className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20 pr-12"
+                              {...register("password")}
+                              placeholder="Mínimo 6 caracteres"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowCreatePassword(!showCreatePassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                              aria-label={showCreatePassword ? "Ocultar senha" : "Mostrar senha"}
+                              title={showCreatePassword ? "Ocultar senha" : "Mostrar senha"}
+                            >
+                              {showCreatePassword ? (
+                                <EyeOff className="w-5 h-5" />
+                              ) : (
+                                <Eye className="w-5 h-5" />
+                              )}
+                            </button>
+                          </div>
                           {errors.password && (
                             <p className="text-sm text-destructive">{errors.password.message}</p>
                           )}
@@ -328,6 +350,7 @@ export default function Settings() {
                             variant="outline"
                             onClick={() => {
                               setIsCreateDialogOpen(false);
+                              setShowCreatePassword(false);
                               reset();
                             }}
                           >
@@ -357,7 +380,7 @@ export default function Settings() {
                 ) : (
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="bg-primary/10">
                         <TableHead>Nome</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Nome de usuário (Instagram)</TableHead>
@@ -373,7 +396,7 @@ export default function Settings() {
                             <TableCell>{u.email}</TableCell>
                             <TableCell>
                               {u.instagramUsername ? (
-                                <span className="text-muted-foreground">@{u.instagramUsername}</span>
+                                <span className="text-primary font-medium">@{u.instagramUsername}</span>
                               ) : (
                                 <span className="text-muted-foreground">-</span>
                               )}
@@ -425,7 +448,13 @@ export default function Settings() {
           )}
 
           {/* Dialog de Edição */}
-          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <Dialog open={isEditDialogOpen} onOpenChange={(open) => {
+            setIsEditDialogOpen(open);
+            if (!open) {
+              setShowEditPassword(false);
+              setSelectedUser(null);
+            }
+          }}>
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>Editar Usuário</DialogTitle>
@@ -461,14 +490,29 @@ export default function Settings() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="edit-password">Nova Senha (deixe em branco para manter)</Label>
-                  <Input
-                    id="edit-password"
-                    type="password"
-                    autoComplete="new-password"
-                    className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                    {...register("password")}
-                    placeholder="Deixe em branco para manter a senha atual"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="edit-password"
+                      type={showEditPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20 pr-12"
+                      {...register("password")}
+                      placeholder="Deixe em branco para manter a senha atual"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowEditPassword(!showEditPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label={showEditPassword ? "Ocultar senha" : "Mostrar senha"}
+                      title={showEditPassword ? "Ocultar senha" : "Mostrar senha"}
+                    >
+                      {showEditPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
                   {errors.password && (
                     <p className="text-sm text-destructive">{errors.password.message}</p>
                   )}
@@ -501,6 +545,7 @@ export default function Settings() {
                     variant="outline"
                     onClick={() => {
                       setIsEditDialogOpen(false);
+                      setShowEditPassword(false);
                       reset();
                       setSelectedUser(null);
                     }}
