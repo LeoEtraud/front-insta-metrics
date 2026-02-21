@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -173,6 +174,7 @@ export default function Settings() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isConnectingInstagram, setIsConnectingInstagram] = useState(false);
   const [isDisconnectingInstagram, setIsDisconnectingInstagram] = useState(false);
+  const [showNoLinkedPageHelp, setShowNoLinkedPageHelp] = useState(false);
 
   // Trata callback OAuth Instagram (instagram_connected ou instagram_error)
   useEffect(() => {
@@ -183,8 +185,14 @@ export default function Settings() {
       queryClient.invalidateQueries({ queryKey: [api.auth.me.path] });
       setSearchParams({}, { replace: true });
     } else if (error) {
-      const msg = error === "instagram_token_expired" ? "Token expirado. Reconecte o Instagram." : decodeURIComponent(error);
-      toast({ title: "Erro ao conectar Instagram", description: msg, variant: "destructive", duration: 6000 });
+      if (error === "no_linked_page") setShowNoLinkedPageHelp(true);
+      const msg =
+        error === "instagram_token_expired"
+          ? "Token expirado. Reconecte o Instagram."
+          : error === "no_linked_page"
+            ? "Nenhuma página com Instagram vinculada. Siga os passos abaixo para vincular."
+            : decodeURIComponent(error);
+      toast({ title: "Erro ao conectar Instagram", description: msg, variant: "destructive", duration: 8000 });
       setSearchParams({}, { replace: true });
     }
   }, [searchParams, toast, queryClient, setSearchParams]);
@@ -449,8 +457,30 @@ export default function Settings() {
                   </Button>
                 </div>
               ) : (
-                <div>
-                  <p className="text-muted-foreground text-sm mb-3">
+                <div className="space-y-4">
+                  {showNoLinkedPageHelp && (
+                    <Alert variant="destructive" className="text-left">
+                      <AlertTitle>Como vincular o Instagram à sua Página do Facebook</AlertTitle>
+                      <AlertDescription>
+                        <ol className="list-decimal list-inside mt-2 space-y-1 text-sm">
+                          <li>Crie ou use uma Página do Facebook (página pública, não perfil pessoal).</li>
+                          <li>No app do Instagram: Configurações → Conta → Alternar para conta profissional e vincule à Página.</li>
+                          <li>Ou no Facebook: Página → Configurações → Instagram → Conectar conta.</li>
+                          <li>
+                            <a
+                              href="https://www.facebook.com/help/instagram/502981923235522"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline font-medium"
+                            >
+                              Ver instruções oficiais da Meta
+                            </a>
+                          </li>
+                        </ol>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  <p className="text-muted-foreground text-sm">
                     Requisitos: Instagram Profissional vinculado a uma Página do Facebook. Você precisa ser admin dessa página.
                   </p>
                   <Button
