@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Sidebar } from "@/components/Sidebar";
 import { useAuth } from "@/hooks/use-auth";
+import { api } from "@/shared/routes";
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from "@/hooks/use-users";
+import { useCompanies } from "@/hooks/use-companies";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +44,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Loader2, Eye, EyeOff } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, Eye, EyeOff, Instagram, Unplug } from "lucide-react";
+import { getApiUrl, getAuthHeaders } from "@/lib/api";
 import type { User } from "@/shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -80,20 +85,162 @@ const userFormSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   instagramUsername: instagramUsernameSchema,
   role: z.enum(["admin", "cliente"]),
+  companyId: z.number().int().positive().optional().nullable(),
 });
 
 type UserFormData = z.infer<typeof userFormSchema>;
 
-// COMPONENTE DE PÁGINA DE CONFIGURAÇÕES - GERENCIA USUÁRIOS (APENAS ADMIN)
+// DIALOG PARA CRIAR EMPRESA
+function CreateCompanyDialog({ onSuccess }: { onSuccess: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setLoading(true);
+    try {
+      const res = await fetch(getApiUrl("/api/companies"), {
+        method: "POST",
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name: name.trim() }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Falha ao criar empresa");
+      }
+      toast({ title: "Empresa criada", variant: "success" });
+      setName("");
+      setOpen(false);
+      onSuccess();
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm">Nova Empresa</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Nova Empresa</DialogTitle>
+          <DialogDescription>Digite o nome da empresa</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="company-name">Nome</Label>
+            <Input
+              id="company-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ex: Minha Empresa"
+              className="mt-2"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Criar"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// COMPONENTE DE PÁGINA DE CONFIGURAÇÕES - GERENCIA USUÁRIOS (APENAS ADMIN) E INTEGRAÇÃO INSTAGRAM
 export default function Settings() {
   const { user, isAdmin } = useAuth();
   const { data: users, isLoading } = useUsers();
+  const { data: companies } = useCompanies(isAdmin());
   const createMutation = useCreateUser();
   const updateMutation = useUpdateUser();
   const deleteMutation = useDeleteUser();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isConnectingInstagram, setIsConnectingInstagram] = useState(false);
+  const [isDisconnectingInstagram, setIsDisconnectingInstagram] = useState(false);
+
+  // Trata callback OAuth Instagram (instagram_connected ou instagram_error)
+  useEffect(() => {
+    const connected = searchParams.get("instagram_connected");
+    const error = searchParams.get("instagram_error");
+    if (connected === "1") {
+      toast({ title: "Instagram conectado!", description: "Sua conta foi vinculada com sucesso.", variant: "success" });
+      queryClient.invalidateQueries({ queryKey: [api.auth.me.path] });
+      setSearchParams({}, { replace: true });
+    } else if (error) {
+      const msg = error === "instagram_token_expired" ? "Token expirado. Reconecte o Instagram." : decodeURIComponent(error);
+      toast({ title: "Erro ao conectar Instagram", description: msg, variant: "destructive", duration: 6000 });
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, toast, queryClient, setSearchParams]);
+
+  const companyId = user?.companyId ?? null;
+  const company = user?.company;
+  const instagramConnected = company?.instagramBusinessAccountId != null;
+  const instagramUsername = company?.instagramUsername;
+
+  const handleConnectInstagram = async () => {
+    if (!companyId) {
+      toast({ title: "Erro", description: "Você precisa estar vinculado a uma empresa.", variant: "destructive" });
+      return;
+    }
+    setIsConnectingInstagram(true);
+    try {
+      const url = `${getApiUrl("/api/auth/meta/start")}?companyId=${companyId}`;
+      const res = await fetch(url, {
+        method: "GET",
+        headers: getAuthHeaders(),
+        redirect: "manual",
+        credentials: "include",
+      });
+      if (res.status === 302) {
+        const location = res.headers.get("Location");
+        if (location) window.location.href = location;
+        else throw new Error("URL de redirecionamento não encontrada");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Erro ao iniciar conexão");
+      }
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message || "Falha ao conectar", variant: "destructive" });
+    } finally {
+      setIsConnectingInstagram(false);
+    }
+  };
+
+  const handleDisconnectInstagram = async () => {
+    if (!companyId) return;
+    setIsDisconnectingInstagram(true);
+    try {
+      const res = await fetch(`${getApiUrl("/api/instagram/disconnect")}?companyId=${companyId}`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Falha ao desconectar");
+      toast({ title: "Instagram desconectado", variant: "success" });
+      queryClient.invalidateQueries({ queryKey: [api.auth.me.path] });
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setIsDisconnectingInstagram(false);
+    }
+  };
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -115,6 +262,7 @@ export default function Settings() {
       name: "",
       instagramUsername: "",
       role: "cliente",
+      companyId: null as number | null,
     },
   });
 
@@ -129,7 +277,7 @@ export default function Settings() {
             password: data.password || undefined,
             name: data.name,
             instagramUsername: data.instagramUsername || undefined,
-            // role não é alterado na edição
+            companyId: data.companyId ?? undefined,
           },
         });
         toast({
@@ -155,6 +303,7 @@ export default function Settings() {
           name: data.name,
           instagramUsername: data.instagramUsername || undefined,
           role: data.role,
+          companyId: data.companyId && !Number.isNaN(data.companyId) ? data.companyId : undefined,
         });
         toast({
           title: "Sucesso",
@@ -175,13 +324,14 @@ export default function Settings() {
     }
   };
 
-  const handleEdit = (user: User) => {
-    setSelectedUser(user);
-    setValue("email", user.email);
-    setValue("name", user.name);
-    setValue("instagramUsername", user.instagramUsername || "");
+  const handleEdit = (u: User) => {
+    setSelectedUser(u);
+    setValue("email", u.email);
+    setValue("name", u.name);
+    setValue("role", (u.role as "admin" | "cliente") || "cliente");
+    setValue("instagramUsername", u.instagramUsername || "");
     setValue("password", "");
-    // role não é editável no modal de edição
+    setValue("companyId", (u as User & { companyId?: number }).companyId ?? null);
     setIsEditDialogOpen(true);
   };
 
@@ -217,10 +367,111 @@ export default function Settings() {
         <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold font-display tracking-tight">Usuários</h1>
-              <p className="text-muted-foreground mt-1">Gerencie usuários do sistema.</p>
+              <h1 className="text-3xl font-bold font-display tracking-tight">Configurações</h1>
+              <p className="text-muted-foreground mt-1">Integrações e gestão de usuários.</p>
             </div>
           </div>
+
+          {/* Empresas - Apenas para Admin */}
+          {isAdmin() && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Empresas</CardTitle>
+                    <CardDescription>
+                      Crie empresas para vincular usuários e conectar contas Instagram
+                    </CardDescription>
+                  </div>
+                  <CreateCompanyDialog
+                    onSuccess={() => {
+                      queryClient.invalidateQueries({ queryKey: ["/api/companies"] });
+                    }}
+                  />
+                </div>
+              </CardHeader>
+              <CardContent>
+                {companies?.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">Nenhuma empresa cadastrada. Crie a primeira acima.</p>
+                ) : (
+                  <ul className="text-sm space-y-1">
+                    {companies?.map((c) => (
+                      <li key={c.id} className="flex items-center gap-2">
+                        <span className="font-medium">{c.name}</span>
+                        {c.instagramUsername && (
+                          <span className="text-muted-foreground">(@{c.instagramUsername})</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Integração Instagram */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Instagram className="w-5 h-5" />
+                Integração Instagram
+              </CardTitle>
+              <CardDescription>
+                Conecte sua conta Instagram Profissional (Business ou Creator) para exibir métricas e insights no dashboard.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {!companyId ? (
+                <p className="text-muted-foreground text-sm">
+                  Você precisa estar vinculado a uma empresa para conectar o Instagram. Entre em contato com o administrador.
+                </p>
+              ) : instagramConnected ? (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium">
+                      Conectado como{" "}
+                      <span className="text-primary">@{instagramUsername || "conta"}</span>
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Sincronize os dados pelo botão no Dashboard para atualizar métricas e posts.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDisconnectInstagram}
+                    disabled={isDisconnectingInstagram}
+                    className="gap-2"
+                  >
+                    {isDisconnectingInstagram ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Unplug className="w-4 h-4" />
+                    )}
+                    Desconectar
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-muted-foreground text-sm mb-3">
+                    Requisitos: Instagram Profissional vinculado a uma Página do Facebook. Você precisa ser admin dessa página.
+                  </p>
+                  <Button
+                    onClick={handleConnectInstagram}
+                    disabled={isConnectingInstagram}
+                    className="gap-2"
+                  >
+                    {isConnectingInstagram ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Instagram className="w-4 h-4" />
+                    )}
+                    Conectar Instagram
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Gestão de Usuários - Apenas para Admin */}
           {isAdmin() && (
@@ -344,6 +595,30 @@ export default function Settings() {
                             </SelectContent>
                           </Select>
                         </div>
+                        {watch("role") === "cliente" && (
+                          <div className="space-y-2">
+                            <Label htmlFor="companyId">Empresa</Label>
+                            <Select
+                              value={watch("companyId") ? String(watch("companyId")) : "none"}
+                              onValueChange={(v) => setValue("companyId", v === "none" ? null : parseInt(v, 10))}
+                            >
+                              <SelectTrigger className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                                <SelectValue placeholder="Selecione a empresa" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Nenhuma</SelectItem>
+                                {companies?.map((c) => (
+                                  <SelectItem key={c.id} value={String(c.id)}>
+                                    {c.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">
+                              Clientes precisam de uma empresa para conectar o Instagram.
+                            </p>
+                          </div>
+                        )}
                         <div className="flex justify-end gap-2 pt-4">
                           <Button
                             type="button"
@@ -517,6 +792,27 @@ export default function Settings() {
                     <p className="text-sm text-destructive">{errors.password.message}</p>
                   )}
                 </div>
+                {watch("role") === "cliente" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-companyId">Empresa</Label>
+                    <Select
+                      value={watch("companyId") ? String(watch("companyId")) : "none"}
+                      onValueChange={(v) => setValue("companyId", v === "none" ? null : parseInt(v, 10))}
+                    >
+                      <SelectTrigger className="border-2 border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                        <SelectValue placeholder="Selecione a empresa" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhuma</SelectItem>
+                        {companies?.map((c) => (
+                          <SelectItem key={c.id} value={String(c.id)}>
+                            {c.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="edit-instagramUsername">Nome de usuário (Instagram)</Label>
                   <Input

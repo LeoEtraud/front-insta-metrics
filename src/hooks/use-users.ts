@@ -45,6 +45,7 @@ export function useCreateUser() {
       name: string;
       instagramUsername?: string;
       role: "admin" | "cliente";
+      companyId?: number | null;
     }) => {
       const res = await fetch(getApiUrl(api.users.create.path), {
         method: "POST",
@@ -82,6 +83,7 @@ export function useUpdateUser() {
         name?: string;
         instagramUsername?: string;
         role?: "admin" | "cliente";
+        companyId?: number | null;
       };
     }) => {
       const url = buildUrl(api.users.update.path, { id: String(id) });

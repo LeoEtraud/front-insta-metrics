@@ -6,16 +6,19 @@ export type User = {
   email: string;
   name: string;
   role: string;
+  companyId: number | null;
   instagramUsername: string | null;
   createdAt: string;
+  company?: Company | null;
 };
 
 export type Company = {
   id: number;
   name: string;
   instagramBusinessAccountId: string | null;
-  instagramAccessToken: string | null;
-  createdAt: string;
+  instagramUsername: string | null;
+  instagramTokenExpiresAt: string | null;
+  createdAt?: string;
 };
 
 export type InstagramPost = {

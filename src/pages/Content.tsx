@@ -1,3 +1,4 @@
+import { useAuth } from "@/hooks/use-auth";
 import { useInstagramPosts } from "@/hooks/use-dashboard";
 import { Sidebar } from "@/components/Sidebar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,13 +16,23 @@ const mediaTypeLabels: Record<string, string> = {
 
 // COMPONENTE DE PÁGINA DE PERFORMANCE DE CONTEÚDO - EXIBE POSTS DO INSTAGRAM COM MÉTRICAS DETALHADAS
 export default function Content() {
-  const { data: posts, isLoading } = useInstagramPosts();
+  const { user } = useAuth();
+  const companyId = user?.companyId ?? null;
+  const { data: posts, isLoading } = useInstagramPosts(companyId);
 
   return (
     <div className="flex min-h-screen bg-muted/30">
       <Sidebar />
       <main className="flex-1 p-6 md:p-8 overflow-y-auto lg:pt-6 md:pt-20 pt-20">
         <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
+          {!companyId && (
+            <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 text-amber-800 dark:text-amber-200">
+              <p className="font-medium">Nenhuma empresa vinculada</p>
+              <p className="text-sm mt-1">
+                Entre em contato com o administrador para vincular seu usuário a uma empresa.
+              </p>
+            </div>
+          )}
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>

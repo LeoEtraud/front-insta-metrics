@@ -1,4 +1,6 @@
+import { useAuth } from "@/hooks/use-auth";
 import { useDashboardSummary, useDashboardTrends, useSyncInstagram } from "@/hooks/use-dashboard";
+import { useToast } from "@/hooks/use-toast";
 import { Sidebar } from "@/components/Sidebar";
 import { StatCard } from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
@@ -28,12 +30,23 @@ import { ptBR } from "date-fns/locale";
 
 // COMPONENTE DE PÁGINA DO DASHBOARD - EXIBE RESUMO DE MÉTRICAS E GRÁFICOS DE TENDÊNCIAS
 export default function Dashboard() {
-  const { data: summary, isLoading: isSummaryLoading } = useDashboardSummary();
-  const { data: trends, isLoading: isTrendsLoading } = useDashboardTrends();
-  const syncMutation = useSyncInstagram();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const companyId = user?.companyId ?? null;
+  const { data: summary, isLoading: isSummaryLoading } = useDashboardSummary(companyId);
+  const { data: trends, isLoading: isTrendsLoading } = useDashboardTrends(companyId);
+  const syncMutation = useSyncInstagram(companyId);
 
   const handleSync = () => {
-    syncMutation.mutate();
+    syncMutation.mutate(undefined, {
+      onError: (err: Error) => {
+        toast({
+          title: "Erro ao sincronizar",
+          description: err.message,
+          variant: "destructive",
+        });
+      },
+    });
   };
 
   const tooltipLabels: Record<string, string> = {
@@ -47,6 +60,14 @@ export default function Dashboard() {
       <Sidebar />
       <main className="flex-1 p-6 md:p-8 overflow-y-auto lg:pt-6 md:pt-20 pt-20">
         <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
+          {!companyId && (
+            <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 text-amber-800 dark:text-amber-200">
+              <p className="font-medium">Nenhuma empresa vinculada</p>
+              <p className="text-sm mt-1">
+                Entre em contato com o administrador para vincular seu usuário a uma empresa e acessar as métricas do Instagram.
+              </p>
+            </div>
+          )}
           
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
