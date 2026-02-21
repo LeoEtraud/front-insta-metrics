@@ -205,15 +205,12 @@ export default function Settings() {
       const res = await fetch(url, {
         method: "GET",
         headers: getAuthHeaders(),
-        redirect: "manual",
         credentials: "include",
       });
-      if (res.status === 302) {
-        const location = res.headers.get("Location");
-        if (location) window.location.href = location;
-        else throw new Error("URL de redirecionamento não encontrada");
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        window.location.href = data.url;
       } else {
-        const data = await res.json().catch(() => ({}));
         throw new Error(data.message || "Erro ao iniciar conexão");
       }
     } catch (err: any) {
