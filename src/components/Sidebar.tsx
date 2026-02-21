@@ -40,7 +40,7 @@ const NAV_ITEMS: Array<{
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Content", href: "/content", icon: ImageIcon },
   { label: "Analytics", href: "/analytics", icon: BarChart2 },
-  { label: "Usuários", href: "/settings", icon: Users, adminOnly: true },
+  { label: "Configurações", href: "/settings", icon: Users },
 ];
 
 // SCHEMA DE VALIDAÇÃO PARA EDIÇÃO DE PERFIL (instagramUsername não é editável aqui)
